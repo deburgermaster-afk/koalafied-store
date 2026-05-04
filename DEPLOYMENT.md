@@ -6,33 +6,34 @@
 - **GitHub Repository**: https://github.com/deburgermaster-afk/koalafied-store
   - All 137 files pushed (Next.js 16, Drizzle ORM, Printify integration, transparent product images)
 - **Vercel Deployment**: https://koalafied-store.vercel.app (live & working)
-- **Custom Domain Added**: `koalafied.store` registered in Vercel project
+- **Custom Domain**: `koalafeild.store` registered in Vercel project
 
-### ⏳ In Progress — Awaiting DNS Propagation
-- **Custom Domain**: `koalafied.store`
-- **DNS Update Required**: Change A record from `23.227.38.65` → `76.76.21.21`
+### ⏳ DNS Propagating
+- **Custom Domain**: `koalafeild.store`
+- **DNS Status**: A record set to `76.76.21.21` (Vercel IP) ✓
 - **Provider**: Dynadot
-- **ETA**: 5 minutes to 48 hours (typically 15–30 minutes)
+- **ETA**: Currently propagating (typically 15–30 minutes, max 48 hours)
 
 ---
 
-## DNS Configuration (What You Did)
+## DNS Configuration (Current State)
 
-At Dynadot, you updated the **A record** for `koalafied.store`:
+At Dynadot, the **A record** for `koalafeild.store` is set to:
 
 | Field | Value |
 |-------|-------|
 | **Record Type** | A |
-| **Domain** | koalafied.store |
+| **Domain** | koalafeild.store |
 | **IP Address** | 76.76.21.21 (Vercel) |
+| **Status** | ✓ Configured |
 
 **To verify it's working:**
 ```bash
-dig koalafied.store +short
+dig koalafeild.store +short
 # Should return: 76.76.21.21
 ```
 
-Once DNS propagates, https://koalafied.store will point to your Koalafied storefront.
+Once DNS propagates, https://koalafeild.store will point to your Koalafied storefront.
 
 ---
 
@@ -68,7 +69,7 @@ All 18 env vars are deployed to Vercel production:
 
 ## Next Steps (After DNS Propagation)
 
-1. **Verify domain**: Visit https://koalafied.store (should load your store)
+1. **Verify domain**: Visit https://koalafeild.store (should load your store)
 2. **Test SSL**: Certificate auto-provisioned by Vercel
 3. **Monitor**: Check Vercel project dashboard for any alerts
 

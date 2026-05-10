@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { products, productImages, variants } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { formatMoney } from "@/lib/format";
+import { ProductDeleteButton } from "@/components/admin/ProductDeleteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -76,8 +77,10 @@ export default async function ProductsAdmin() {
                       {p.active ? (p.featured ? "active · featured" : "active") : "draft"}
                     </span>
                   </td>
-                  <td className="pr-4">
-                    <Link href={`/products/${p.handle}`} className="text-xs underline mr-3" target="_blank">view</Link>
+                  <td className="pr-4 flex gap-3">
+                    <Link href={`/admin/products/${p.id}`} className="text-xs underline">edit</Link>
+                    <Link href={`/products/${p.handle}`} className="text-xs underline" target="_blank">view</Link>
+                    <ProductDeleteButton productId={p.id} productTitle={p.title} />
                   </td>
                 </tr>
               );

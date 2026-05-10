@@ -1,11 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { formatMoney } from "@/lib/format";
 import { Price } from "./Price";
-import { useCartCount } from "./CartProvider";
 
 type Img = { url: string; alt: string };
 type Opt = { name: string; values: string[] };
@@ -31,15 +28,10 @@ export function ProductDetail({
   variants: Var[];
   isPreorder?: boolean;
 }) {
-  const router = useRouter();
-  const { refresh } = useCartCount();
   const [selected, setSelected] = useState<(string | null)[]>(
     options.map((o) => (o.values.length === 1 ? o.values[0] : null))
   );
-  const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
-  const [adding, setAdding] = useState(false);
-  const [msg, setMsg] = useState<string>("");
 
   const matched = useMemo<Var | null>(() => {
     if (selected.some((s) => s === null && options.length)) return null;
@@ -55,39 +47,6 @@ export function ProductDetail({
 
   const price = matched?.priceCents ?? variants[0]?.priceCents ?? 0;
   const inStock = matched?.available ?? false;
-
-  async function addToCart() {
-    if (!matched) {
-      setMsg("Please select all options.");
-      return;
-    }
-    if (!inStock) {
-      setMsg("Out of stock.");
-      return;
-    }
-    setAdding(true);
-    setMsg("");
-    try {
-      const r = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ variantId: matched.id, qty }),
-      });
-      if (!r.ok) throw new Error("cart_fail");
-      window.dispatchEvent(new CustomEvent("koalafied:cart"));
-      refresh();
-      setMsg("Added to cart.");
-    } catch {
-      setMsg("Could not add. Try again.");
-    } finally {
-      setAdding(false);
-    }
-  }
-
-  async function buyNow() {
-    await addToCart();
-    router.push("/cart");
-  }
 
   return (
     <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6">
@@ -156,42 +115,18 @@ export function ProductDetail({
             </div>
           ))}
 
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex items-center border border-line">
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2">−</button>
-              <span className="w-10 text-center">{qty}</span>
-              <button onClick={() => setQty(Math.min(20, qty + 1))} className="px-3 py-2">+</button>
-            </div>
-            {matched && (
-              <span className="text-sm text-muted">
-                {inStock ? "In stock" : "Out of stock"}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={addToCart}
-              disabled={adding || !matched || !inStock}
-              className="bg-ink text-white py-3 text-sm font-semibold disabled:opacity-50 hover:bg-black/85"
-            >
-              {adding ? "Adding…" : isPreorder ? "Preorder" : "Add to cart"}
-            </button>
-            <button
-              onClick={buyNow}
-              disabled={adding || !matched || !inStock}
-              className="border border-ink py-3 text-sm font-semibold disabled:opacity-50 hover:bg-ink hover:text-white"
-            >
-              {isPreorder ? "Preorder now" : "Buy now"}
-            </button>
-          </div>
-          {isPreorder && (
-            <div className="mt-3 border border-amber-300 bg-amber-50 text-amber-900 text-xs p-3 leading-relaxed">
-              <strong className="font-semibold">Preorder.</strong> Rashguards are produced in limited drops.
-              Estimated dispatch <strong>4–6 weeks</strong> from order. You'll be charged today and notified the moment your parcel ships with AusPost tracking.
+          {matched && (
+            <div className="text-sm text-muted mb-6">
+              {inStock ? "In stock" : "Out of stock"}
             </div>
           )}
-          {msg && <div className="mt-3 text-sm text-muted">{msg}</div>}
+
+          <div className="bg-[#f8f8f6] border border-line p-6 rounded mb-8">
+            <p className="font-semibold mb-2">Shopping & Checkout Disabled</p>
+            <p className="text-sm text-muted">
+              Direct shopping and checkout functionality has been disabled. Please contact us for orders.
+            </p>
+          </div>
 
           <div className="mt-8 prose prose-sm max-w-none text-ink/85 whitespace-pre-line">
             {product.description}

@@ -2,18 +2,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { useCartCount } from "./CartProvider";
 
 const items = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/shop", label: "Shop", icon: ShopIcon },
   { href: "/track", label: "Track", icon: TruckIcon },
-  { href: "/cart", label: "Cart", icon: BagIcon, badge: true },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { count } = useCartCount();
   if (pathname?.startsWith("/admin")) return null;
   return (
     <div className="fixed left-1/2 bottom-4 -translate-x-1/2 z-50 print:hidden">
@@ -21,7 +18,7 @@ export function BottomNav() {
         className="flex items-center gap-1 rounded-full bg-ink text-white shadow-2xl px-2 py-2 backdrop-blur"
         style={{ boxShadow: "0 10px 40px rgba(0,0,0,0.25)" }}
       >
-        {items.map(({ href, label, icon: Icon, badge }) => {
+        {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
           return (
             <Link
@@ -34,11 +31,6 @@ export function BottomNav() {
             >
               <Icon className="w-5 h-5 mb-0.5" />
               <span>{label}</span>
-              {badge && count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-accent text-white text-[10px] leading-none rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-semibold">
-                  {count}
-                </span>
-              )}
             </Link>
           );
         })}

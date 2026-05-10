@@ -1,31 +1,71 @@
 /**
  * Lightweight email sender.
- * Tries Resend (RESEND_API_KEY) → otherwise logs to console (dev fallback).
+ * Tries SendPulse (PULSE_API_KEY) → otherwise Resend (RESEND_API_KEY) → otherwise logs to console.
  */
 type Mail = { to: string; subject: string; html: string; text?: string };
 
+function parseFromHeader(from: string) {
+  const match = from.match(/^(.*)<([^>]+)>$/);
+  if (match) {
+    return { name: match[1].trim(), email: match[2].trim() };
+  }
+  return { email: from.trim() };
+}
+
+function stripHtml(html: string) {
+  return html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+}
+
 export async function sendMail(mail: Mail): Promise<{ ok: boolean; channel: string }> {
+  const pulseKey = process.env.PULSE_API_KEY;
   const resendKey = process.env.RESEND_API_KEY;
-  const from = process.env.MAIL_FROM ?? "Koalafied <noreply@koalafied.store>";
+  const fromHeader = process.env.MAIL_FROM ?? "Koalafied <noreply@koalafied.store>";
+  const from = parseFromHeader(fromHeader);
+
+  if (pulseKey) {
+    try {
+      const response = await fetch("https://api.sendpulse.com/smtp/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${pulseKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject: mail.subject,
+          from,
+          to: [{ email: mail.to, name: mail.to }],
+          html: mail.html,
+          text: mail.text ?? stripHtml(mail.html),
+        }),
+      });
+      if (!response.ok) {
+        console.error("SendPulse error", await response.text());
+      } else {
+        return { ok: true, channel: "pulse" };
+      }
+    } catch (e) {
+      console.error("SendPulse exception", e);
+    }
+  }
 
   if (resendKey) {
     try {
-      const r = await fetch("https://api.resend.com/emails", {
+      const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${resendKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from,
+          from: fromHeader,
           to: [mail.to],
           subject: mail.subject,
           html: mail.html,
           text: mail.text,
         }),
       });
-      if (!r.ok) {
-        console.error("Resend error", await r.text());
+      if (!response.ok) {
+        console.error("Resend error", await response.text());
         return { ok: false, channel: "resend" };
       }
       return { ok: true, channel: "resend" };
@@ -35,9 +75,8 @@ export async function sendMail(mail: Mail): Promise<{ ok: boolean; channel: stri
     }
   }
 
-  // Dev fallback
   console.log(
-    `\n[mail:dev] To: ${mail.to}\nSubject: ${mail.subject}\n${mail.text ?? mail.html.replace(/<[^>]+>/g, "")}\n`
+    `\n[mail:dev] To: ${mail.to}\nSubject: ${mail.subject}\n${mail.text ?? stripHtml(mail.html)}\n`
   );
   return { ok: true, channel: "console" };
 }

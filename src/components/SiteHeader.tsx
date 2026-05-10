@@ -4,11 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { useCartCount } from "./CartProvider";
 import { CurrencySwitcher } from "./CurrencySwitcher";
 
 export function SiteHeader() {
-  const { count } = useCartCount();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -93,16 +91,6 @@ export function SiteHeader() {
             </svg>
           </Link>
           <CurrencySwitcher dark={transparent} />
-          <Link href="/cart" aria-label="Cart" className={clsx("relative grid place-items-center w-10 h-10 rounded-full", transparent ? "hover:bg-white/15" : "hover:bg-[#f3f3f1]")}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M5 8h14l-1 12H6z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
-            </svg>
-            {count > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-accent text-white text-[10px] leading-none rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-semibold">
-                {count}
-              </span>
-            )}
-          </Link>
           <button
             aria-label="Menu"
             onClick={() => setMenuOpen((o) => !o)}
@@ -153,7 +141,7 @@ export function SiteHeader() {
             <div>
               <div className="font-semibold uppercase tracking-wider text-xs mb-3">Account</div>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/admin" onClick={() => setMenuOpen(false)}>Admin</Link></li>
+                <li><Link href="/account" onClick={() => setMenuOpen(false)}>My account</Link></li>
               </ul>
             </div>
           </div>

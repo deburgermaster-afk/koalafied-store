@@ -11,12 +11,40 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const shipping: { code: string; name: string; priceCents: number } | null = body.shipping ?? null;
   const address: ShippingAddress | null = body.address ?? null;
+  const customerEmail: string | null = body.email ?? null;
+  const customerName: string | null = body.name ?? null;
+  const customerPhone: string | null = body.phone ?? null;
 
-  const me = await getCurrentCustomer();
+  // Try to get current customer, or create a guest customer
+  let me = await getCurrentCustomer();
+  if (!me && customerEmail) {
+    // Create or get guest customer with provided email
+    const [existing] = await db
+      .select()
+      .from(customers)
+      .where(eq(customers.email, customerEmail.toLowerCase()))
+      .limit(1);
+    
+    if (existing) {
+      me = existing;
+    } else {
+      const [created] = await db
+        .insert(customers)
+        .values({
+          email: customerEmail.toLowerCase(),
+          name: customerName || undefined,
+          phone: customerPhone || undefined,
+          lastLoginAt: new Date(),
+        })
+        .returning();
+      me = created;
+    }
+  }
+
   if (!me) {
     return NextResponse.json(
-      { error: "Sign in with email code to continue." },
-      { status: 401 }
+      { error: "Email is required to checkout." },
+      { status: 400 }
     );
   }
 

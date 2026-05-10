@@ -72,7 +72,7 @@ export function CartView({ initialItems }: { initialItems: HydratedLine[] }) {
           ))}
         </div>
 
-        <CheckoutFlow subtotal={subtotal} itemCount={itemCount} />
+        <CheckoutFlow />
       </div>
     </div>
   );

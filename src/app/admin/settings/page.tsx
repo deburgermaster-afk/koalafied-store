@@ -79,6 +79,11 @@ export default async function AdminSettings() {
       title: "Email (OTP + receipts)",
       rows: [
         {
+          k: "Pulse API key",
+          v: process.env.PULSE_API_KEY ? "configured" : "missing — using Resend or dev fallback",
+          ok: !!process.env.PULSE_API_KEY,
+        },
+        {
           k: "Resend API key",
           v: process.env.RESEND_API_KEY ? "configured" : "missing — OTPs printed to server logs",
           ok: !!process.env.RESEND_API_KEY,

@@ -117,16 +117,16 @@ export function ProductDetail({
 
           {matched && (
             <div className="text-sm text-muted mb-6">
-              {inStock ? "In stock" : "Out of stock"}
+              {inStock ? "✓ In stock" : "Out of stock"}
             </div>
           )}
 
-          <div className="bg-[#f8f8f6] border border-line p-6 rounded mb-8">
-            <p className="font-semibold mb-2">Shopping & Checkout Disabled</p>
-            <p className="text-sm text-muted">
-              Direct shopping and checkout functionality has been disabled. Please contact us for orders.
-            </p>
-          </div>
+          <button
+            disabled={!inStock}
+            className="w-full bg-ink text-white py-3 px-4 rounded font-semibold mb-8 hover:bg-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add to Cart
+          </button>
 
           <div className="mt-8 prose prose-sm max-w-none text-ink/85 whitespace-pre-line">
             {product.description}

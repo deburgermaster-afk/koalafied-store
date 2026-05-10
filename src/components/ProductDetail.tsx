@@ -50,29 +50,29 @@ export function ProductDetail({
 
   return (
     <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6">
-      <div className="grid lg:grid-cols-2 gap-10">
-        <div>
-          <div className="relative aspect-square bg-[#f5f4f0] overflow-hidden max-h-screen max-w-full">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
+        <div className="flex flex-col">
+          <div className="relative bg-[#f5f4f0] overflow-hidden rounded flex items-center justify-center" style={{ height: 'clamp(300px, 80vh, 600px)', maxWidth: '100%' }}>
             {images[activeImg] && (
               <Image
                 src={images[activeImg].url}
                 alt={images[activeImg].alt}
                 fill
                 priority
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 45vw"
-                className="object-contain p-4 sm:p-6"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 50vw"
+                className="object-contain p-2 sm:p-4 md:p-6"
               />
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex gap-2 mt-2 overflow-x-auto no-scrollbar">
+            <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-2">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
                   className={clsx(
-                    "relative shrink-0 w-20 h-20 bg-[#f5f4f0] border",
-                    i === activeImg ? "border-ink" : "border-line"
+                    "relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-[#f5f4f0] border rounded transition-colors",
+                    i === activeImg ? "border-ink border-2" : "border-line hover:border-ink/50"
                   )}
                 >
                   <Image src={img.url} alt={img.alt} fill className="object-contain p-1" sizes="80px" />

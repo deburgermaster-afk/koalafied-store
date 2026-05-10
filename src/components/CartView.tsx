@@ -72,7 +72,7 @@ export function CartView({ initialItems }: { initialItems: HydratedLine[] }) {
           ))}
         </div>
 
-        <CheckoutFlow />
+        <CheckoutFlow items={items} />
       </div>
     </div>
   );

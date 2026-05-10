@@ -1,6 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Price } from "./Price";
+import type { HydratedLine } from "@/lib/cart";
 
 interface ShippingAddress {
   name: string;
@@ -10,11 +12,10 @@ interface ShippingAddress {
   postcode: string;
 }
 
-export function CheckoutFlow() {
+export function CheckoutFlow({ items = [] }: { items?: HydratedLine[] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [cartItems, setCartItems] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,13 +26,7 @@ export function CheckoutFlow() {
     postcode: "",
   });
 
-  useEffect(() => {
-    // Load cart from localStorage
-    const cart = localStorage.getItem("cart");
-    if (cart) {
-      setCartItems(JSON.parse(cart));
-    }
-  }, []);
+  const subtotal = items.reduce((s, i) => s + i.priceCents * i.qty, 0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -50,7 +45,7 @@ export function CheckoutFlow() {
         return;
       }
 
-      if (cartItems.length === 0) {
+      if (items.length === 0) {
         setError("Your cart is empty");
         setLoading(false);
         return;
@@ -73,8 +68,8 @@ export function CheckoutFlow() {
           phone: formData.phone,
         },
         address,
-        items: cartItems,
-        total: cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0),
+        items: items,
+        total: subtotal,
       };
 
       // Store checkout data in localStorage for processing
@@ -90,10 +85,33 @@ export function CheckoutFlow() {
   };
 
   return (
-    <div className="bg-[#f8f8f6] p-6 rounded border border-line">
-      <h2 className="font-semibold mb-6">Checkout</h2>
+    <div>
+      <div className="bg-[#f8f8f6] p-6 rounded border border-line mb-6">
+        <h2 className="font-semibold mb-4">Order Summary</h2>
+        <div className="space-y-2 text-sm">
+          {items.length === 0 ? (
+            <p className="text-muted">Your cart is empty</p>
+          ) : (
+            <>
+              {items.map((i) => (
+                <div key={i.variantId} className="flex justify-between">
+                  <span>{i.title} {i.variantLabel && `(${i.variantLabel})`} x {i.qty}</span>
+                  <span><Price cents={i.priceCents * i.qty} /></span>
+                </div>
+              ))}
+              <div className="border-t border-line pt-2 mt-2 font-semibold flex justify-between">
+                <span>Total</span>
+                <span><Price cents={subtotal} /></span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
-      {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
+      <div className="bg-[#f8f8f6] p-6 rounded border border-line">
+        <h2 className="font-semibold mb-6">Checkout</h2>
+
+        {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -183,6 +201,7 @@ export function CheckoutFlow() {
           {loading ? "Processing..." : "Proceed to Payment"}
         </button>
       </form>
+      </div>
     </div>
   );
 }

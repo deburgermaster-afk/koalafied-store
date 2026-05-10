@@ -7,6 +7,7 @@ const items = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/shop", label: "Shop", icon: ShopIcon },
   { href: "/track", label: "Track", icon: TruckIcon },
+  { href: "/checkout", label: "Cart", icon: CartIcon },
 ];
 
 export function BottomNav() {
@@ -64,6 +65,13 @@ function BagIcon(p: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...p}>
       <path d="M5 8h14l-1 12H6z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </svg>
+  );
+}
+function CartIcon(p: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...p}>
+      <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
     </svg>
   );
 }

@@ -52,15 +52,15 @@ export function ProductDetail({
     <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 pt-6">
       <div className="grid lg:grid-cols-2 gap-10">
         <div>
-          <div className="relative aspect-square bg-[#f5f4f0] overflow-hidden">
+          <div className="relative aspect-square bg-[#f5f4f0] overflow-hidden max-h-screen max-w-full">
             {images[activeImg] && (
               <Image
                 src={images[activeImg].url}
                 alt={images[activeImg].alt}
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain p-6"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 45vw"
+                className="object-contain p-4 sm:p-6"
               />
             )}
           </div>

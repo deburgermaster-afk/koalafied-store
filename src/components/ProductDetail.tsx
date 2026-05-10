@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Price } from "./Price";
 
@@ -32,6 +33,26 @@ export function ProductDetail({
     options.map((o) => (o.values.length === 1 ? o.values[0] : null))
   );
   const [activeImg, setActiveImg] = useState(0);
+  const [adding, setAdding] = useState(false);
+  const router = useRouter();
+
+  const handleAddToCart = async () => {
+    if (!matched?.id) return;
+    setAdding(true);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ variantId: matched.id, qty: 1 }),
+      });
+      if (res.ok) {
+        window.dispatchEvent(new CustomEvent("koalafied:cart"));
+        router.push("/checkout");
+      }
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const matched = useMemo<Var | null>(() => {
     if (selected.some((s) => s === null && options.length)) return null;
@@ -122,10 +143,11 @@ export function ProductDetail({
           )}
 
           <button
-            disabled={!inStock}
+            disabled={!inStock || adding}
+            onClick={handleAddToCart}
             className="w-full bg-ink text-white py-3 px-4 rounded font-semibold mb-8 hover:bg-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add to Cart
+            {adding ? "Adding..." : "Add to Cart"}
           </button>
 
           <div className="mt-8 prose prose-sm max-w-none text-ink/85 whitespace-pre-line">

@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Price } from "./Price";
 
@@ -34,7 +33,6 @@ export function ProductDetail({
   );
   const [activeImg, setActiveImg] = useState(0);
   const [adding, setAdding] = useState(false);
-  const router = useRouter();
 
   const handleAddToCart = async () => {
     if (!matched?.id) return;
@@ -47,7 +45,6 @@ export function ProductDetail({
       });
       if (res.ok) {
         window.dispatchEvent(new CustomEvent("koalafied:cart"));
-        router.push("/checkout");
       }
     } finally {
       setAdding(false);

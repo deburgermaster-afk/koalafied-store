@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 type Ctx = { count: number; refresh: () => void };
 const CartCtx = createContext<Ctx>({ count: 0, refresh: () => {} });
@@ -9,6 +9,25 @@ export function useCartCount() {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  // Cart provider is now a no-op (kept for backwards compatibility)
-  return <CartCtx.Provider value={{ count: 0, refresh: () => {} }}>{children}</CartCtx.Provider>;
+  const [count, setCount] = useState(0);
+
+  const refresh = async () => {
+    try {
+      const res = await fetch("/api/cart");
+      const data = await res.json();
+      const total = data.items?.reduce((sum: number, item: any) => sum + item.qty, 0) || 0;
+      setCount(total);
+    } catch {
+      setCount(0);
+    }
+  };
+
+  useEffect(() => {
+    refresh();
+    const handler = () => refresh();
+    window.addEventListener("koalafied:cart", handler);
+    return () => window.removeEventListener("koalafied:cart", handler);
+  }, []);
+
+  return <CartCtx.Provider value={{ count, refresh }}>{children}</CartCtx.Provider>;
 }

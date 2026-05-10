@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useCartCount } from "./CartProvider";
 
 const items = [
   { href: "/", label: "Home", icon: HomeIcon },
@@ -12,6 +13,7 @@ const items = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { count } = useCartCount();
   if (pathname?.startsWith("/admin")) return null;
   return (
     <div className="fixed left-1/2 bottom-4 -translate-x-1/2 z-50 print:hidden">
@@ -21,6 +23,7 @@ export function BottomNav() {
       >
         {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname?.startsWith(href);
+          const isCart = href === "/checkout";
           return (
             <Link
               key={href}
@@ -31,6 +34,11 @@ export function BottomNav() {
               )}
             >
               <Icon className="w-5 h-5 mb-0.5" />
+              {isCart && count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {count > 99 ? "99+" : count}
+                </span>
+              )}
               <span>{label}</span>
             </Link>
           );

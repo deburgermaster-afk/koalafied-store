@@ -59,24 +59,40 @@ export function CheckoutFlow({ items = [] }: { items?: HydratedLine[] }) {
         postcode: formData.postcode,
       };
 
-      // For now, redirect to a simple checkout success
-      // In a full implementation, this would integrate with Stripe
-      const checkoutData = {
-        customer: {
-          name: formData.name,
+      // Call checkout API to create Stripe session
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           email: formData.email,
+          name: formData.name,
           phone: formData.phone,
-        },
-        address,
-        items: items,
-        total: subtotal,
-      };
+          address,
+          shipping: {
+            code: "auspost_standard",
+            name: "Australia Post Standard",
+            priceCents: 0, // For now, free shipping. Update based on your logic
+          },
+        }),
+      });
 
-      // Store checkout data in localStorage for processing
-      localStorage.setItem("pending_checkout", JSON.stringify(checkoutData));
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Checkout failed");
+        setLoading(false);
+        return;
+      }
 
-      // Redirect to checkout success (simplified flow)
-      router.push("/checkout/success");
+      const data = await res.json();
+      if (data.url) {
+        // Clear cart and dispatch event before redirecting to Stripe
+        await fetch("/api/cart", { method: "DELETE" });
+        window.dispatchEvent(new CustomEvent("koalafied:cart"));
+        window.location.href = data.url;
+      } else {
+        setError("Failed to create checkout session");
+        setLoading(false);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Checkout failed");
     } finally {
